@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="main.css">
+  <title>Document</title>
+</head>
+
+<body>
+  <div class="wrapper">
+    <button class="btn" onclick="menuOpen()">Click</button>    
+  </div>
+  <div class="back"></div>
+    <div class="hamburger-menu menu">        
+      <div class="content">
+        <a href="#">News</a>
+        <a href="#">Contacts</a>
+        <a href="#">Address</a>
+      </div>
+    </div>  
+  
+
+  <script>
+    var $menu = document.querySelector('.menu');
+    var $overlay = document.querySelector('.back');
+
+    var menu_width = $menu.clientWidth;
+    var last_position = -menu_width;
+
+    var swipe_menu = false;
+
+    var mouseDownX = 0;
+    var moveDistance = -menu_width;
+
+    window.addEventListener('mousedown', function (e) {
+      if (e.clientX <= 100) {
+        menuStartSwipe(e);
+      }
+    })
+
+    window.addEventListener('mouseup', menuFinalSwipe)
+
+    window.addEventListener('mousemove', function (e) {
+      if (swipe_menu) {
+        menuDrag(e);
+      }
+    })
+    $menu.addEventListener('mousedown', function (e) {
+      menuStartSwipe(e);
+    })
+    $overlay.addEventListener('mousedown', menuClose)
+
+    function menuStartSwipe(e) {
+      e.preventDefault();
+      mouseDownX = e.clientX;
+      swipe_menu = true;
+    }
+
+    function menuDrag(e) {
+      moveDistance = Math.max(Math.min(e.clientX - mouseDownX + last_position, 0), -menu_width);
+      $menu.style.cssText = 'transform: translate(' + moveDistance + 'px, 0px)';
+      if (moveDistance > -menu_width) {
+        var opacity = Math.min((moveDistance + menu_width) / menu_width, 1);
+        $overlay.style.cssText = 'visibility: visible; opacity:' + opacity + '';
+      } else {
+        $overlay.style.cssText = 'visibility: hidden';
+      }
+    }
+
+    function menuFinalSwipe() {
+      swipe_menu = false;
+      if (moveDistance + menu_width > menu_width / 10) {
+        menuOpen();
+      }
+    }
+
+    function menuOpen() {
+      $menu.classList.add('active');
+      $menu.style.cssText = 'transition: transform .2s linear';
+      $overlay.classList.add('active');
+      $overlay.style.cssText = 'transition: opacity .2s linear';
+      moveDistance = 0;
+      last_position = moveDistance;
+    }
+
+    function menuClose() {
+      $menu.classList.remove('active');
+      $menu.style.cssText = 'transition: transform 0.2s linear';
+      $overlay.classList.remove('active');
+      $overlay.style.cssText = 'transition: opacity .2s linear, visibility .3s linear';
+      moveDistance = -menu_width;
+      last_position = moveDistance;
+    }
+  </script>
+</body>
+
+</html>
